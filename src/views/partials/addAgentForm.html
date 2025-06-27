@@ -1,0 +1,61 @@
+<form id="addAgentForm">
+                        <label for="NomComplet">Nom Complet :</label>
+                        <input type="text" id="NomComplet" name="NomComplet" placeholder="Entrez le nom" required />
+                        <label for="sexe">Sexe :</label>
+                        <select id="sexe" name="sexe" required>
+                            <option value="" disabled selected>Choisir le sexe</option>
+                            <option value="Homme">Homme</option>
+                            <option value="Femme">Femme</option>
+                        </select>
+                        <label for="NomDuPere">Nom du Père :</label>
+                        <input type="text" id="NomDuPere" name="NomDuPere" placeholder="Entrez le nom du père" required />
+                        <label for="NomDeLaMere">Nom de la Mère :</label>
+                        <input type="text" id="NomDeLaMere" name="NomDeLaMere" placeholder="Entrez le nom de la mère" required />
+                        <label for="LieuDeNaissance">Lieu de Naissance :</label>
+                        <input type="text" id="LieuDeNaissance" name="LieuDeNaissance" placeholder="Entrez le lieu de naissance" required />
+                        <label for="DateDeNaissance">Date de Naissance :</label>
+                        <input type="date" id="DateDeNaissance" name="DateDeNaissance" required />
+                        <label for="Province">Province :</label>
+                        <input type="text" id="Province" name="Province" placeholder="Entrez la province" required />
+                        <label for="Territoire">Territoire :</label>
+                        <input type="text" id="Territoire" name="Territoire" placeholder="Entrez le territoire" required />
+                        <label for="Ville">Ville :</label>
+                        <input type="text" id="Ville" name="Ville" placeholder="Entrez la ville" required />
+                        <label for="Adresse">Adresse :</label>
+                        <input type="text" id="Adresse" name="Adresse" placeholder="Entrez l'adresse" required />
+                        <label for="Email">Email :</label>
+                        <input type="email" id="Email" name="Email" placeholder="Entrez l'email" required />
+                        <label for="Numero">Numéro :</label>
+                        <input type="tel" id="Numero" name="Numero" placeholder="Entrez le numéro" required pattern="[0-9]{10}" title="Veuillez entrer un numéro valide de 10 chiffres" />
+                        <label for="Direction">Direction :</label>
+                        <input type="text" name="Direction" id="Direction">
+                        <label for="Grade">Grade :</label>
+                        <input type="text" id="Grade" name="Grade" placeholder="Entrez le grade" required />
+                        <label for="Fonction">Fonction :</label>
+                        <input type="text" id="Fonction" name="Fonction" placeholder="Entrez la fonction" required />
+                        <label for="Matricule">Matricule :</label>
+                        <input type="text" id="Matricule" name="Matricule" placeholder="Entrez le matricule" required />
+                        <label for="piece"></label>
+                        <select id="piece" name="piece" required>
+                            <option value="" disabled selected>Choisir le type de pièce</option>
+                            <option value="carte d'electeur">carte d'electeur</option>
+                            <option value="Passeport">Passeport</option>
+                            <option value="Permis de conduire">Permis de conduire</option>
+                        </select>
+                        <label for="NumeroPiece">Numéro de la pièce :</label>
+                        <input type="text" id="NumeroPiece" name="NumeroPiece" placeholder="Entrez le numéro de la pièce" required />
+                        <label for="Diplome">Diplôme :</label>
+                        <select id="Diplome" name="Diplome" required>
+                            <option value="" disabled selected>Choisir le diplôme</option>
+                            <option value="Graduat">Graduat</option>
+                            <option value="Licence">Licence</option>
+                            <option value="Master">Master</option>
+                            <option value="Doctorat">Doctorat</option>
+                        </select>
+                        <label for="agentPhoto">Photo :</label>
+                        <input type="file" id="agentPhoto" name="agentPhoto" accept="image/*" />
+                        <label for="agentDocument">Document :</label>
+                        <input type="file" id="agentDocument" name="agentDocument" accept=".pdf,.doc,.docx" />
+                        <button type="button" onclick="fermerModale('addAgentFormContainer')">Fermer</button>
+                        <button type="submit">Enregistrer</button>
+                    </form>
