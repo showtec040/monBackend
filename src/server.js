@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
@@ -20,7 +21,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad', {
     setupSocket(server);
 
     // Démarrer le serveur
-    server.listen(PORT, '0.0.0.0', () => {
+    server.listen(PORT, () => {
         console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
     });
 })

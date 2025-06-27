@@ -53,11 +53,6 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
-// Connexion à la base de données MongoDB
-mongoose.connect('mongodb://localhost:27017/pad', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
 
 // Export de l'app pour server.js
 module.exports = app;
