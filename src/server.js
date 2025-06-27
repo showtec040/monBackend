@@ -6,6 +6,10 @@ const app = require('./app');
 const { setupSocket } = require('./socket'); // à créer si pas déjà fait
 const PORT = process.env.PORT || 3000;
 const path = require('path');
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
 
 // Connexion à la base de données MongoDB Atlas ou locale
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad', {
