@@ -30,7 +30,5 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad', {
     console.error('Erreur de connexion à la base de données:', err);
 });
 
-// Rendre le dossier uploads accessible publiquement
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
 
