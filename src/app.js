@@ -10,7 +10,11 @@ const methodOverride = require('method-override'); // <-- Ajoute cette ligne
 let agentRoutes, publicationRoutes, courierRoutes, departementRoutes, gradeRoutes, fonctionRoutes , documentArchiveRoutes, archiveRoutes, statsRoutes;
 // Essaye de charger les routes, sinon crée un routeur vide
 
-try { agentRoutes = require('./routes/agentRoutes'); } catch { agentRoutes = express.Router(); }
+try { agentRoutes = require('./routes/agentRoutes'); } catch (err) {
+  console.error("Erreur lors du chargement de agentRoutes :", err);
+  agentRoutes = express.Router();
+}
+
 try { publicationRoutes = require('./routes/publicationRoutes'); } catch { publicationRoutes = express.Router(); }
 try { courierRoutes = require('./routes/courierRoutes'); } catch { courierRoutes = express.Router(); }
 try { departementRoutes = require('./routes/departementRoutes'); } catch { departementRoutes = express.Router(); }
