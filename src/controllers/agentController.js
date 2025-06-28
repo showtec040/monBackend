@@ -1,6 +1,6 @@
 // backend/src/controllers/agentController.js
 const Agent = require('../models/agent');
-const Notification = require('../models/notification');
+const Notification = require('../models/Notification');
 
 // Créer un nouvel agent
 exports.createAgent = async (req, res) => {
