@@ -30,7 +30,7 @@ router.post('/archives/upload', upload.single('file'), async (req, res) => {
             uploadedBy: req.body.uploadedBy
         });
         await doc.save();
-        res.json({ success: true, doc });
+        res.json({ success: true, document: doc });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
