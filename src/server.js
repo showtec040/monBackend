@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const http = require('http');
+const http = require('https');
 const app = require('./app');
 const { setupSocket } = require('./socket'); // à créer si pas déjà fait
 const PORT = process.env.PORT || 3000;
