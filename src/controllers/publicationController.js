@@ -1,4 +1,4 @@
-const Publication = require('../models/Publication');
+const Publication = require('../models/publication');
 
 exports.getAllPublications = async (req, res) => {
     const publications = await Publication.find().sort({ date: -1 });
