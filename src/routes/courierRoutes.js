@@ -93,6 +93,23 @@ router.get('/', async (req, res) => {
     }
 });
 
+// ...existing code...
+
+// Route pour supprimer un courrier
+router.delete('/:id', async (req, res) => {
+    try {
+        const courrier = await Courier.findByIdAndDelete(req.params.id);
+        if (!courrier) {
+            return res.status(404).json({ success: false, message: "Courrier non trouvé." });
+        }
+        res.json({ success: true, message: "Courrier supprimé." });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Erreur serveur", error: err.message });
+    }
+});
+
+// ...existing code...
+
 module.exports = router;
 
 // Controller
