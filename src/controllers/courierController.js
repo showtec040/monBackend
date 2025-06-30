@@ -12,21 +12,20 @@ exports.sendCourier = async (req, res) => {
         if (!expediteur || !destinataire || !objet || !message) {
             return res.status(400).json({ success: false, message: 'Tous les champs obligatoires doivent être renseignés.' });
         }
-        // Vérification que expediteur est un ObjectId
+        // Vérification que expediteur et destinataire sont des ObjectId
         const isValidObjectId = (id) => /^[a-fA-F0-9]{24}$/.test(id);
-        if (!isValidObjectId(expediteur)) {
-            return res.status(400).json({ success: false, message: 'Expéditeur invalide (ObjectId attendu).' });
+        if (!isValidObjectId(expediteur) || !isValidObjectId(destinataire)) {
+            return res.status(400).json({ success: false, message: 'Expéditeur ou destinataire invalide (ObjectId attendu).' });
         }
-        // Ici, destinataire = nom du département/direction (string)
-        // On cherche le directeur chef de direction de ce département
-        const directeur = await Agent.findOne({ departement: destinataire, fonction: /directeur chef de direction/i });
-        if (!directeur) {
-            return res.status(400).json({ success: false, message: 'Aucun Directeur Chef de direction trouvé pour ce département.' });
+        // Vérification que le destinataire existe
+        const destinataireAgent = await Agent.findById(destinataire);
+        if (!destinataireAgent) {
+            return res.status(400).json({ success: false, message: 'Destinataire introuvable.' });
         }
-        // Création du courrier avec le vrai destinataire (ObjectId du directeur)
+        // Création du courrier avec le vrai destinataire (ObjectId de l'agent)
         const newCourier = new Courier({
             expediteur,
-            destinataire: directeur._id,
+            destinataire: destinataireAgent._id,
             objet,
             message,
             fichier
@@ -34,7 +33,7 @@ exports.sendCourier = async (req, res) => {
         await newCourier.save();
 
         await Notification.create({
-            userId: directeur._id, // Correction ici pour utiliser le champ userId
+            userId: destinataireAgent._id,
             message: "Vous avez reçu un courrier.",
             date: new Date(),
             lu: false
@@ -107,7 +106,7 @@ exports.getSentCouriers = async (req, res) => {
   }
 };
 
-// Correction : export des bons noms de fonctions pour les routes
+// Correction : export des bons noms de fonctions pour les routes
 module.exports = {
     sendCourier: exports.sendCourier,
     getReceivedCouriers: exports.getReceivedCouriers,
