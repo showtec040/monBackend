@@ -9,6 +9,14 @@ router.get('/', async (req, res) => {
   res.json(notifications);
 });
 
+// Marquer toutes les notifications comme lues pour un utilisateur
+router.put('/markAllRead', async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ message: "Utilisateur non spécifié." });
+  await Notification.updateMany({ userId, lu: false }, { $set: { lu: true } });
+  res.json({ success: true });
+});
+
 router.get('/count', async (req, res) => {
   const userId = req.query.userId;
   if (!userId) return res.status(400).json({ message: "Utilisateur non spécifié." });
