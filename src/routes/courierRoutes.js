@@ -1,11 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const Courier = require('../models/courier');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
-const courierController = require('../controllers/courierController');
 const Notification = require('../models/Notification');
-const Agent = require('../models/agent'); // si tu veux le nom du destinataire
+const Agent = require('../models/agent');
+const courierController = require('../controllers/courierController');
+const path = require('path');
+
+// CONFIGURATION MULTER AVEC EXTENSION D'ORIGINE
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
+    cb(null, base + '-' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
 
 // Route pour envoyer un courrier
 router.post('/', upload.single('fichier'), async (req, res) => {
