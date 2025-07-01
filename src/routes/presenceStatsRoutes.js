@@ -31,4 +31,14 @@ router.post('/', async (req, res) => {
     }
 });
 
+// GET /api/presence/stats
+router.get('/', async (req, res) => {
+    try {
+        const stats = await StatistiquePresence.find().sort({ date: -1 });
+        res.status(200).json(stats);
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors de la récupération des statistiques", error });
+    }
+});
+
 module.exports = router;
