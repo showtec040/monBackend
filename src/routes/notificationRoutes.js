@@ -8,7 +8,18 @@ router.get('/', async (req, res) => {
   const notifications = await Notification.find({ userId }).sort({ date: -1 });
   res.json(notifications);
 });
-
+// Supprimer une notification par son id
+router.delete('/notifications/:id', async (req, res) => {
+  try {
+    const notif = await Notification.findByIdAndDelete(req.params.id);
+    if (!notif) {
+      return res.status(404).json({ success: false, message: "Notification introuvable." });
+    }
+    res.json({ success: true, message: "Notification supprimée." });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+});
 // Marquer toutes les notifications comme lues pour un utilisateur
 router.put('/markAllRead', async (req, res) => {
   const userId = req.query.userId;
