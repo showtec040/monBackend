@@ -8,8 +8,9 @@ router.get('/', async (req, res) => {
   const notifications = await Notification.find({ userId }).sort({ date: -1 });
   res.json(notifications);
 });
-// Supprimer une notification par son id
-router.delete('/notifications/:id', async (req, res) => {
+
+// CORRECTION ICI : juste '/:id'
+router.delete('/:id', async (req, res) => {
   try {
     const notif = await Notification.findByIdAndDelete(req.params.id);
     if (!notif) {
@@ -20,7 +21,7 @@ router.delete('/notifications/:id', async (req, res) => {
     res.status(500).json({ success: false, message: "Erreur serveur." });
   }
 });
-// Marquer toutes les notifications comme lues pour un utilisateur
+
 router.put('/markAllRead', async (req, res) => {
   const userId = req.query.userId;
   if (!userId) return res.status(400).json({ message: "Utilisateur non spécifié." });
@@ -39,8 +40,8 @@ router.post('/',
   async (req, res) => {
     const { courrier } = req.body;
     await Notification.create({
-      userId: courrier.destinataire, // l'ID du destinataire
-      message: `Vous avez bien confirmé la réception du courrier "${courrier.objet}".`,
+      userId: courrier.destinataire,
+      message: `Vous avez bien confirmé la réception du courrier \"${courrier.objet}\".`,
       lu: false,
       date: new Date()
     });
