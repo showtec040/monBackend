@@ -13,7 +13,7 @@ router.get('/unread/:userId', async (req, res) => {
     }
 });
 
-// Récupérer l'historique entre deux utilisateurs
+// Récupérer l'historique entre deux utilisateurs (trié par date croissante)
 router.get('/:user1/:user2', async (req, res) => {
     try {
         const { user1, user2 } = req.params;
@@ -33,7 +33,14 @@ router.get('/:user1/:user2', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { from, to, message, type, fileName, date } = req.body;
-        const msg = await Message.create({ from, to, message, type, fileName, date });
+        const msg = await Message.create({
+            from,
+            to,
+            message,
+            type: type || "text",
+            fileName,
+            date: date ? new Date(date) : new Date()
+        });
         res.json(msg);
     } catch (err) {
         res.status(500).json({ error: err.message });
