@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
             await Notification.create({
                 userId: secretaire._id,
                 titre: "Nouvelles statistiques de présence",
-                message: "Des statistiques de présence viennent d’être enregistrées.",
+                message: "Des statistiques de présence viennent d’être envoyés.",
                 date: new Date(),
                 lu: false
             });
