@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const StatPresence = require('../models/StatPresence');
 const Notification = require('../models/Notification');
+const Agent = require('../models/agent'); // adapte le chemin si besoin
+
 // GET /api/statspresence
 router.get('/', async (req, res) => {
     try {
@@ -25,13 +27,26 @@ router.post('/', async (req, res) => {
             }
         }
 
-      
         // Insertion en base
         const stats = await StatPresence.insertMany(statsArray);
+
+        // Recherche du Secrétaire Général
+        const secretaire = await Agent.findOne({ fonction: "Secrétaire Général" });
+        if (secretaire) {
+            await Notification.create({
+                userId: secretaire._id,
+                titre: "Nouvelles statistiques de présence",
+                message: "Des statistiques de présence viennent d’être enregistrées.",
+                date: new Date(),
+                lu: false
+            });
+        }
+
         res.status(200).json({ message: "Statistiques enregistrées !", stats });
     } catch (error) {
         console.error('❌ Erreur enregistrement stats:', error);
         res.status(500).json({ message: "Erreur lors de l'enregistrement des statistiques", error: error.message });
     }
 });
+
 module.exports = router;
