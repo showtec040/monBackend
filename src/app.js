@@ -48,7 +48,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api', documentArchiveRoutes);
 app.use('/api/archives', archiveRoutes);
 app.use('/api/stats', statsRoutes);
-const statspresenceRoutes = require('./backend/routes/statspresence');
+const statspresenceRoutes = require('./routes/statspresence');
 app.use('/api/statspresence', statspresenceRoutes);
 
 // Middleware de gestion des erreurs
