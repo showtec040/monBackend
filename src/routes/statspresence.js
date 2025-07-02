@@ -16,14 +16,20 @@ router.get('/', async (req, res) => {
 // POST /api/statspresence
 router.post('/', async (req, res) => {
     try {
-        // Peut recevoir un tableau ou un objet unique
-        const body = Array.isArray(req.body) ? req.body : [req.body];
-        const stats = await StatPresence.insertMany(body);
+        // Si le body est un tableau, on l'utilise tel quel, sinon on le met dans un tableau
+        const statsArray = Array.isArray(req.body) ? req.body : [req.body];
+        // On vérifie que chaque objet a bien les champs requis
+        for (const stat of statsArray) {
+            if (!stat.departement || stat.totalAgents == null || stat.totalPresence == null || stat.totalAbsence == null) {
+                return res.status(400).json({ message: "Format de statistique invalide." });
+            }
+        }
+        // Insertion en base
+        const stats = await StatPresence.insertMany(statsArray);
         res.status(200).json({ message: "Statistiques enregistrées !", stats });
     } catch (error) {
         console.error('❌ Erreur enregistrement stats:', error);
         res.status(500).json({ message: "Erreur lors de l'enregistrement des statistiques", error: error.message });
     }
 });
-
 module.exports = router;
