@@ -48,8 +48,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api', documentArchiveRoutes);
 app.use('/api/archives', archiveRoutes);
 app.use('/api/stats', statsRoutes);
-const presenceStatsRoutes = require('./routes/presenceStatsRoutes');
-app.use('/api/presence/stats', presenceStatsRoutes); // <-- Ajout de la route pour les statistiques de présence
+const statspresenceRoutes = require('./backend/routes/statspresence');
+app.use('/api/statspresence', statspresenceRoutes);-- Ajout de la route pour les statistiques de présence
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
