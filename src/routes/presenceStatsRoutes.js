@@ -37,6 +37,7 @@ router.get('/', async (req, res) => {
         const stats = await StatistiquePresence.find().sort({ date: -1 });
         res.status(200).json(stats);
     } catch (error) {
+        console.error('Erreur récupération stats:', error); // Ajoute ce log
         res.status(500).json({ message: "Erreur lors de la récupération des statistiques", error });
     }
 });
