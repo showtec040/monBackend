@@ -49,7 +49,7 @@ app.use('/api', documentArchiveRoutes);
 app.use('/api/archives', archiveRoutes);
 app.use('/api/stats', statsRoutes);
 const statspresenceRoutes = require('./backend/routes/statspresence');
-app.use('/api/statspresence', statspresenceRoutes);-- Ajout de la route pour les statistiques de présence
+app.use('/api/statspresence', statspresenceRoutes);
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
