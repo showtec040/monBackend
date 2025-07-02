@@ -25,21 +25,7 @@ router.post('/', async (req, res) => {
             }
         }
 
-        
-    // 2. Trouver le Secrétaire Général
-            const secretaire = await Agent.findOne({ fonction: "Secrétaire Général" });
-            if (!secretaire) {
-                return res.status(404).json({ message: "Secrétaire Général non trouvé" });
-            }
-    
-            // 3. Créer une notification pour le Secrétaire Général
-            await Notification.create({
-                userId: secretaire._id,
-                titre: "Nouvelles statistiques de présence",
-                message: "Des statistiques de présence viennent d’être envoyer.",
-                date: new Date(),
-                lu: false
-            });
+      
         // Insertion en base
         const stats = await StatPresence.insertMany(statsArray);
         res.status(200).json({ message: "Statistiques enregistrées !", stats });
