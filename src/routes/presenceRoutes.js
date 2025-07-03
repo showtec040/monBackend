@@ -73,12 +73,25 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// Signature d'une présence + notification DRH
 router.put('/:id/signer', async (req, res) => {
     try {
         const presence = await Presence.findById(req.params.id);
         if (!presence) return res.status(404).json({ success: false, message: "Présence non trouvée" });
         presence.statut = "signé";
         await presence.save();
+
+        // Notifier le Directeur des ressources humaines
+        const drh = await Agent.findOne({ fonction: /directeur des ressources humaines/i });
+        if (drh) {
+            await Notification.create({
+                userId: drh._id,
+                message: `La présence du ${presence.date} pour le département ${presence.departement} a été signée.`,
+                date: new Date(),
+                lu: false
+            });
+        }
+
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, message: "Erreur serveur" });
