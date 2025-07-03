@@ -9,6 +9,7 @@ function getDateSansHeure(date = new Date()) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+// Enregistrement d'une présence
 router.post('/', async (req, res) => {
     try {
         const { date, agents, userId, departement } = req.body; // Ajout du champ departement
@@ -46,12 +47,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Vérifier si la présence du jour existe déjà
+// Vérifier si la présence du jour existe déjà pour un département
 router.get('/', async (req, res) => {
     try {
-        const { date } = req.query;
-        if (date) {
-            const dejaEnregistre = await Presence.exists({ date });
+        const { date, departement } = req.query;
+        if (date && departement) {
+            const dejaEnregistre = await Presence.exists({ date, departement });
             return res.json({ dejaEnvoye: !!dejaEnregistre });
         }
         // Sinon, retourne toutes les présences
