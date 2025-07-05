@@ -1,4 +1,3 @@
-// backend/src/controllers/agentController.js
 const Agent = require('../models/agent');
 const Notification = require('../models/Notification');
 
@@ -25,6 +24,11 @@ exports.createAgent = async (req, res) => {
             "Secrétaire de Direction",
             "Archiviste"
         ];
+        // Fonctions globalement uniques (un seul compte pour toute la base)
+        const fonctionsGlobalementUniques = [
+            "Secrétaire Général",
+            "Directeur des ressources humaines"
+        ];
         if (fonctionsUniques.includes(req.body.fonction)) {
             const existFonction = await Agent.findOne({
                 fonction: req.body.fonction,
@@ -34,6 +38,18 @@ exports.createAgent = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}" dans ce département.`
+                });
+            }
+        }
+        // Vérification pour SG et DRH (un seul compte pour toute la base)
+        if (fonctionsGlobalementUniques.includes(req.body.fonction)) {
+            const existFonctionUnique = await Agent.findOne({
+                fonction: req.body.fonction
+            });
+            if (existFonctionUnique) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}".`
                 });
             }
         }
@@ -62,35 +78,7 @@ exports.createAgent = async (req, res) => {
                 ? maxAgent.numeroInscription + 1
                 : 3;
         }
-// Fonctions globalement uniques (un seul compte pour toute la base)
-const fonctionsGlobalementUniques = [
-    "Secrétaire Général",
-    "Directeur des ressources humaines"
-];
-if (fonctionsUniques.includes(req.body.fonction)) {
-    const existFonction = await Agent.findOne({
-        fonction: req.body.fonction,
-        departement: req.body.departement
-    });
-    if (existFonction) {
-        return res.status(400).json({
-            success: false,
-            message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}" dans ce département.`
-        });
-    }
-}
-// Vérification pour SG et DRH (un seul compte pour toute la base)
-if (fonctionsGlobalementUniques.includes(req.body.fonction)) {
-    const existFonctionUnique = await Agent.findOne({
-        fonction: req.body.fonction
-    });
-    if (existFonctionUnique) {
-        return res.status(400).json({
-            success: false,
-            message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}".`
-        });
-    }
-}
+
         // Récupération des fichiers envoyés par Multer
         const photo = req.files && req.files.photo ? req.files.photo[0].filename : 'default_user.png';
         const documents = req.files && req.files.documents
@@ -238,7 +226,7 @@ exports.validerAgent = async (req, res) => {
       update,
       { new: true }
     );
-// --- AJOUT : Notifier tous les DRH si statut validé ---
+    // --- AJOUT : Notifier tous les DRH si statut validé ---
     if (agent && agent.statut === "validé") {
       const drhs = await Agent.find({ fonction: "Directeur des ressources humaines" });
       const notifications = drhs.map(drh => ({
@@ -251,7 +239,6 @@ exports.validerAgent = async (req, res) => {
         await Notification.insertMany(notifications);
       }
     }
-      
     res.json(agent);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -297,14 +284,17 @@ exports.changePassword = async (req, res) => {
     const agent = await Agent.findById(req.params.id);
     if (!agent) return res.status(404).json({ success: false, message: "Agent non trouvé" });
 
-    // Vérifie l'ancien mot de passe
-    if (agent.password !== req.body.oldPassword) {
+    // Vérifie l'ancien mot de passe (adapté au frontend)
+    const ancienMotDePasse = req.body.ancienMotDePasse;
+    const nouveauMotDePasse = req.body.nouveauMotDePasse;
+
+    if (agent.password !== ancienMotDePasse) {
       return res.status(400).json({ success: false, message: "Ancien mot de passe incorrect." });
     }
 
-    agent.password = req.body.password;
+    agent.password = nouveauMotDePasse;
     await agent.save();
-    res.json({ success: true });
+    res.json({ success: true, message: "Mot de passe mis à jour avec succès." });
   } catch (err) {
     res.status(500).json({ success: false, message: "Erreur serveur" });
   }
