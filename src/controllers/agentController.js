@@ -210,6 +210,20 @@ exports.validerAgent = async (req, res) => {
       update,
       { new: true }
     );
+// --- AJOUT : Notifier tous les DRH si statut validé ---
+    if (agent && agent.statut === "validé") {
+      const drhs = await Agent.find({ fonction: "Directeur des ressources humaines" });
+      const notifications = drhs.map(drh => ({
+        destinataire: drh._id,
+        message: `L'agent ${agent.nomComplet || agent.matricule} a été validé.`,
+        date: new Date(),
+        lu: false
+      }));
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
+    }
+      
     res.json(agent);
   } catch (err) {
     res.status(400).json({ message: err.message });
