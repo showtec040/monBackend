@@ -62,7 +62,35 @@ exports.createAgent = async (req, res) => {
                 ? maxAgent.numeroInscription + 1
                 : 3;
         }
-
+// Fonctions globalement uniques (un seul compte pour toute la base)
+const fonctionsGlobalementUniques = [
+    "Secrétaire Général",
+    "Directeur des ressources humaines"
+];
+if (fonctionsUniques.includes(req.body.fonction)) {
+    const existFonction = await Agent.findOne({
+        fonction: req.body.fonction,
+        departement: req.body.departement
+    });
+    if (existFonction) {
+        return res.status(400).json({
+            success: false,
+            message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}" dans ce département.`
+        });
+    }
+}
+// Vérification pour SG et DRH (un seul compte pour toute la base)
+if (fonctionsGlobalementUniques.includes(req.body.fonction)) {
+    const existFonctionUnique = await Agent.findOne({
+        fonction: req.body.fonction
+    });
+    if (existFonctionUnique) {
+        return res.status(400).json({
+            success: false,
+            message: `Il existe déjà un utilisateur avec la fonction "${req.body.fonction}".`
+        });
+    }
+}
         // Récupération des fichiers envoyés par Multer
         const photo = req.files && req.files.photo ? req.files.photo[0].filename : 'default_user.png';
         const documents = req.files && req.files.documents
