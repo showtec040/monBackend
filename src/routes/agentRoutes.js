@@ -43,7 +43,7 @@ router.get('/fonction/:fonction/departement/:departement', async (req, res) => {
 router.get('/en-attente/departement/:departement', agentController.getAgentsEnAttenteByDepartement);
 
 // Modification du mot de passe (cohérence avec le frontend)
-router.put('/agents/:id/password', agentController.changePassword);
+router.put('/:id/password', agentController.changePassword);
 // Modification des infos personnelles
 router.put('/agents/:id/infos', agentController.updateInfosPersonnelles);
 
