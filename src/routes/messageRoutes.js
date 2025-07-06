@@ -3,8 +3,8 @@ const http = require('http');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
-const User = require('./backend/models/agent');
-const Message = require('./backend/models/Message');
+const User = require('../models/agent');
+const Message = require('../models/Message');
 
 const app = express();
 app.use(cors());
