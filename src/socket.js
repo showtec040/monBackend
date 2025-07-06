@@ -1,54 +1,59 @@
+// socket.js
 const { Server } = require('socket.io');
-// Stockage temporaire (remplace par une base de données si besoin)
-let messages = []; // [{fromId, toId, message, date}]
-let userSockets = {}; // { userId: socket.id }
+const Message = require('./backend/models/Message'); // adapte le chemin si besoin
+
+// Pour garder la liste des utilisateurs connectés
+const connectedUsers = new Map();
 
 function setupSocket(server) {
     const io = new Server(server, {
-        cors: { origin: "*" }
+        cors: { origin: "*", methods: ["GET", "POST"] }
     });
 
     io.on('connection', (socket) => {
-        console.log('Nouvel utilisateur connecté');
-
-        // Enregistrement de l'utilisateur par son _id
-        socket.on('register', (userId) => {
-            userSockets[userId] = socket.id;
+        // Authentification simple
+        socket.on('login', ({ userId }) => {
+            connectedUsers.set(socket.id, userId);
+            const onlineUserIds = Array.from(connectedUsers.values());
+            io.emit('onlineUsers', onlineUserIds);
         });
 
-        // Quand le client demande l'historique pour une conversation
-        socket.on('demanderHistorique', ({ userA, userB }) => {
-            const historique = messages.filter(
-                m =>
-                    (m.fromId === userA && m.toId === userB) ||
-                    (m.fromId === userB && m.toId === userA)
-            );
-            socket.emit('messageHistory', historique);
+        // Récupérer l'historique des messages
+        socket.on('getMessages', async ({ from, to }) => {
+            const messages = await Message.find({
+                $or: [
+                    { from, to },
+                    { from: to, to: from }
+                ]
+            }).sort({ date: 1 });
+            socket.emit('messages', messages);
         });
 
-        // Quand un message est envoyé
-        socket.on('sendMessage', (data) => {
-            data.date = new Date();
-            messages.push(data);
-            // Envoi à l'expéditeur
-            if (userSockets[data.fromId]) {
-                io.to(userSockets[data.fromId]).emit('receiveMessage', data);
-            }
-            // Envoi au destinataire
-            if (userSockets[data.toId] && data.toId !== data.fromId) {
-                io.to(userSockets[data.toId]).emit('receiveMessage', data);
-            }
-        });
-
-        socket.on('disconnect', () => {
-            // Nettoyage (optionnel)
-            for (const [userId, id] of Object.entries(userSockets)) {
-                if (id === socket.id) {
-                    delete userSockets[userId];
-                    break;
+        // Envoi d'un message
+        socket.on('sendMessage', async (msg) => {
+            // Par défaut, un message envoyé n'est pas lu
+            msg.lu = false;
+            const message = new Message(msg);
+            await message.save();
+            // Envoi au destinataire et à l'expéditeur
+            for (let [sockId, userId] of connectedUsers.entries()) {
+                if (userId == msg.to || userId == msg.from) {
+                    io.to(sockId).emit('newMessage', message);
                 }
             }
-            console.log('Utilisateur déconnecté');
+        });
+
+        // Marquer les messages comme lus
+        socket.on('markAsRead', async ({ from, to }) => {
+            await Message.updateMany({ from, to, lu: false }, { $set: { lu: true } });
+            // Optionnel : notifier l'expéditeur que ses messages ont été lus
+        });
+
+        // Déconnexion
+        socket.on('disconnect', () => {
+            connectedUsers.delete(socket.id);
+            const onlineUserIds = Array.from(connectedUsers.values());
+            io.emit('onlineUsers', onlineUserIds);
         });
     });
 }
