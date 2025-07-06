@@ -42,13 +42,6 @@ function setupSocket(server) {
                 }
             }
         });
-
-        // Marquer les messages comme lus
-        socket.on('markAsRead', async ({ from, to }) => {
-            await Message.updateMany({ from, to, lu: false }, { $set: { lu: true } });
-            // Optionnel : notifier l'expéditeur que ses messages ont été lus
-        });
-
         // Déconnexion
         socket.on('disconnect', () => {
             connectedUsers.delete(socket.id);
