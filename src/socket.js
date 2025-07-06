@@ -1,6 +1,6 @@
 // socket.js
 const { Server } = require('socket.io');
-const Message = require('./backend/models/Message'); // adapte le chemin si besoin
+const Message = require('./backend/src/models/Message'); // adapte le chemin si besoin
 
 // Pour garder la liste des utilisateurs connectés
 const connectedUsers = new Map();
