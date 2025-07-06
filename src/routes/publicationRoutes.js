@@ -15,11 +15,12 @@ router.get('/', async (req, res) => {
 // Ajouter une publication
 router.post('/', async (req, res) => {
     try {
-        const { titre, contenu, auteur, mediaUrl, mediaType } = req.body;
+        const { titre, contenu, auteur,nomAuteur, mediaUrl, mediaType } = req.body;
         const nouvellePublication = new Publication({
             titre,
             contenu,
             auteur,
+            nomAuteur,
             mediaUrl,
             mediaType,
             date: new Date()
