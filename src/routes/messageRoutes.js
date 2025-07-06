@@ -1,63 +1,74 @@
 const express = require('express');
-const router = express.Router();
-const Message = require('../models/message').Message;
+const http = require('http');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const { Server } = require('socket.io');
+const User = require('./backend/models/User');
+const Message = require('./backend/models/Message');
 
-// Compter les messages non lus pour un utilisateur
-router.get('/unread/:userId', async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const count = await Message.countDocuments({ to: userId, lu: false });
-        res.json({ count });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Connexion MongoDB
+mongoose.connect('mongodb://localhost:27017/pad-messagerie', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Liste des utilisateurs connectés (socketId <-> userId)
+const connectedUsers = new Map();
+
+// Route pour récupérer tous les utilisateurs (à sécuriser)
+app.get('/api/users', async (req, res) => {
+  const users = await User.find({}, '_id nom email');
+  res.json(users);
 });
 
-// Récupérer l'historique entre deux utilisateurs (trié par date croissante)
-router.get('/:user1/:user2', async (req, res) => {
-    try {
-        const { user1, user2 } = req.params;
-        const messages = await Message.find({
-            $or: [
-                { from: user1, to: user2 },
-                { from: user2, to: user1 }
-            ]
-        }).sort({ date: 1 });
-        res.json(messages);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// --- Socket.IO ---
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-// Enregistrer un message
-router.post('/', async (req, res) => {
-    try {
-        const { from, to, message, type, fileName, date } = req.body;
-        const msg = await Message.create({
-            from,
-            to,
-            message,
-            type: type || "text",
-            fileName,
-            date: date ? new Date(date) : new Date()
-        });
-        res.json(msg);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+io.on('connection', (socket) => {
+  // Authentification simple par userId (à remplacer par un vrai token)
+  socket.on('login', async ({ userId }) => {
+    connectedUsers.set(socket.id, userId);
+    // Optionnel : broadcast la liste des connectés
+    const onlineUserIds = Array.from(connectedUsers.values());
+    io.emit('onlineUsers', onlineUserIds);
+  });
+
+  // Récupérer l'historique des messages
+  socket.on('getMessages', async ({ from, to }) => {
+    const messages = await Message.find({
+      $or: [
+        { from, to },
+        { from: to, to: from }
+      ]
+    }).sort({ date: 1 });
+    socket.emit('messages', messages);
+  });
+
+  // Envoi d'un message
+  socket.on('sendMessage', async (msg) => {
+    const message = new Message(msg);
+    await message.save();
+    // Envoi au destinataire si connecté
+    for (let [sockId, userId] of connectedUsers.entries()) {
+      if (userId === msg.to || userId === msg.from) {
+        io.to(sockId).emit('newMessage', message);
+      }
     }
+  });
+
+  // Déconnexion
+  socket.on('disconnect', () => {
+    connectedUsers.delete(socket.id);
+    const onlineUserIds = Array.from(connectedUsers.values());
+    io.emit('onlineUsers', onlineUserIds);
+  });
 });
 
-// Marquer les messages comme lus
-router.put('/read/:from/:to', async (req, res) => {
-    try {
-        await Message.updateMany(
-            { from: req.params.from, to: req.params.to, lu: false },
-            { $set: { lu: true } }
-        );
-        res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log('Serveur Socket.IO avancé lancé sur le port', PORT);
 });
-
-module.exports = router;
