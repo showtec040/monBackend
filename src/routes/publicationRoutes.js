@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Publication = require('../models/Publication'); // adapte le chemin 
+const Publication = require('../models/Publication'); // adapte le chemin si besoin
 
 // Ajouter une publication
 router.post('/', async (req, res) => {
@@ -21,8 +21,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-// ... (mets ici les routes PUT et DELETE déjà envoyées)
-module.exports = router;
 // Modifier une publication
 router.put('/:id', async (req, res) => {
     try {
