@@ -6,6 +6,6 @@ const MessageSchema = new mongoose.Schema({
   file: String,
   fileName: String,
   date: { type: Date, default: Date.now }
-  lu: { type: Boolean, default: false } // Ajout du champ "lu"
+  lu: { type: Boolean, default: false } 
 });
 module.exports = mongoose.model('Message', MessageSchema);
