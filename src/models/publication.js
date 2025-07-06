@@ -10,6 +10,7 @@ const publicationSchema = new mongoose.Schema({
     titre: String,
     contenu: String,
     auteur: String,
+    nomAuteur: String,
     date: { type: Date, default: Date.now },
     mediaUrl: String,
     mediaType: String,
