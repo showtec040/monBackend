@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Publication = require('../models/Publication'); // adapte le chemin si besoin
 
+// Afficher toutes les publications
+router.get('/', async (req, res) => {
+    try {
+        const publications = await Publication.find().sort({ date: -1 });
+        res.json(publications);
+    } catch (err) {
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+});
+
 // Ajouter une publication
 router.post('/', async (req, res) => {
     try {
