@@ -9,10 +9,7 @@ const path = require('path');
 
 
 // Connexion à la base de données MongoDB Atlas ou locale
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad')
 .then(() => {
     console.log('Connexion à la base de données réussie');
     // Créer le serveur HTTP
