@@ -32,7 +32,18 @@ app.use(express.json({ limit: '10mb' })); // ou plus si besoin
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(methodOverride('_method')); // <-- Ajoute cette ligne ici
 
-
+// Middleware de vérification de version frontend
+const FRONTEND_VERSION = "1.0.0"; // À mettre à jour à chaque release
+app.use((req, res, next) => {
+    // On vérifie la version sur les routes API (sauf fichiers statiques)
+    if (req.path.startsWith('/api')) {
+        const clientVersion = req.headers['x-frontend-version'];
+        if (!clientVersion || clientVersion !== FRONTEND_VERSION) {
+            return res.status(426).json({ success: false, message: "Cette Version de l'application est  obsolète. mettez a jour votre application ou contacter l'administrateur . tresor040@gmail.com" });
+        }
+    }
+    next();
+});
 
 // Routes principales
 app.use('/api/agents', agentRoutes);
