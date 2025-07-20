@@ -113,6 +113,20 @@ exports.createAgent = async (req, res) => {
             numeroInscription: numeroInscription
         });
         await nouvelAgent.save();
+
+// --- AJOUT : Notification pour SG et DRH ---
+        const fonctionsNotif = ["Directeur des ressources humaines", "Secrétaire Général"];
+        const destinataires = await Agent.find({ fonction: { $in: fonctionsNotif } });
+        for (const destinataire of destinataires) {
+            await Notification.create({
+                userId: destinataire._id,
+                titre: "Nouvel agent ajouté",
+                message: `Un nouvel agent (${nouvelAgent.nomComplet}) vient d'être ajouté.`,
+                date: new Date(),
+                lu: false
+            });
+        }
+        
         res.json({ success: true, statut: nouvelAgent.statut, numeroInscription: nouvelAgent.numeroInscription });
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
