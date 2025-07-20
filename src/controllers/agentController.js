@@ -242,17 +242,17 @@ exports.validerAgent = async (req, res) => {
       update,
       { new: true }
     );
-    // --- AJOUT : Notifier tous les DRH si statut validé ---
-    if (agent && agent.statut === "validé") {
-      const drhs = await Agent.find({ fonction: "Directeur des ressources humaines" });
-      const notifications = drhs.map(drh => ({
-        destinataire: drh._id,
-        message: `L'agent ${agent.nomComplet || agent.matricule} a été validé.`,
-        date: new Date(),
-        lu: false
-      }));
-      if (notifications.length > 0) {
-        await Notification.insertMany(notifications);
+   if (agent && agent.statut === "validé") {
+      const fonctionsNotif = ["Directeur des ressources humaines", "Secrétaire Général"];
+      const destinataires = await Agent.find({ fonction: { $in: fonctionsNotif } });
+      for (const destinataire of destinataires) {
+        await Notification.create({
+          userId: destinataire._id,
+          titre: "Agent validé",
+          message: `L'agent ${agent.nomComplet || agent.matricule} a été validé.`,
+          date: new Date(),
+          lu: false
+        });
       }
     }
     res.json(agent);
