@@ -18,19 +18,14 @@ router.get('/', async (req, res) => {
 // POST /api/statspresence
 router.post('/', async (req, res) => {
     try {
-        // Si le body est un tableau, on l'utilise tel quel, sinon on le met dans un tableau
         const statsArray = Array.isArray(req.body) ? req.body : [req.body];
-        // On vérifie que chaque objet a bien les champs requis
         for (const stat of statsArray) {
             if (!stat.departement || stat.totalAgents == null || stat.totalPresence == null || stat.totalAbsence == null) {
                 return res.status(400).json({ message: "Format de statistique invalide." });
             }
         }
-
-        // Insertion en base
         const stats = await StatPresence.insertMany(statsArray);
 
-        // Recherche du Secrétaire Général
         const secretaire = await Agent.findOne({ fonction: "Secrétaire Général" });
         if (secretaire) {
             await Notification.create({
@@ -46,6 +41,17 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.error('❌ Erreur enregistrement stats:', error);
         res.status(500).json({ message: "Erreur lors de l'enregistrement des statistiques", error: error.message });
+    }
+});
+
+// DELETE /api/statspresence
+router.delete('/', async (req, res) => {
+    try {
+        await StatPresence.deleteMany({});
+        res.status(200).json({ message: "Toutes les statistiques ont été supprimées." });
+    } catch (error) {
+        console.error('❌ Erreur suppression stats:', error);
+        res.status(500).json({ message: "Erreur lors de la suppression des statistiques", error: error.message });
     }
 });
 
