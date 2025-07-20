@@ -86,7 +86,7 @@ router.put('/:id/signer', async (req, res) => {
         if (drh) {
             await Notification.create({
                 userId: drh._id,
-                message: `La présence du ${presence.date} pour le département ${presence.departement} a été signée.`,
+                message: `La présence du ${presence.date} pour le département ${presence.departement} a été envoyé par le directeur chef de service.`,
                 date: new Date(),
                 lu: false
             });
