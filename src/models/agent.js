@@ -56,7 +56,7 @@ const agentSchema = new mongoose.Schema({
     sexe: { type: String, enum: ["Masculin", "Féminin"] },
     pieceIdentite: { type: String, enum: ["Carte d'électeur", "Permis", "Passport"] },
     numeroPiece: { type: String },
-    Diplome: { type: String, enum: ["Graduat", "Licence", "Master", "Doctorat"] },
+    Diplome: { type: String, enum: ["Graduat", "Licence", "Master", "Doctorat","Deux 6 (diplôme d’état)","Brevet"] },
     documents: [{ type: String }], // URLs ou base64 ou fichiers
     statut: { type: String, default: "en attente de mise à jour" },
     numeroInscription: { type: Number },
