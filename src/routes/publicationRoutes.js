@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Publication = require('../models/publication'); // adapte le chemin si besoin
+const Notification = require('../models/notification'); // adapte le chemin si besoin
 
 // Afficher toutes les publications
 router.get('/', async (req, res) => {
@@ -12,10 +13,10 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ajouter une publication
+// Ajouter une publication + notification
 router.post('/', async (req, res) => {
     try {
-        const { titre, contenu, auteur,nomAuteur, mediaUrl, mediaType } = req.body;
+        const { titre, contenu, auteur, nomAuteur, mediaUrl, mediaType } = req.body;
         const nouvellePublication = new Publication({
             titre,
             contenu,
@@ -26,6 +27,16 @@ router.post('/', async (req, res) => {
             date: new Date()
         });
         const saved = await nouvellePublication.save();
+
+        // Création de la notification
+        const notif = new Notification({
+            message: `Nouvelle publication : ${titre}`,
+            auteur: nomAuteur || auteur,
+            via: "Publication",
+            createdAt: new Date()
+        });
+        await notif.save();
+
         res.json(saved);
     } catch (err) {
         res.status(500).json({ message: "Erreur serveur" });
