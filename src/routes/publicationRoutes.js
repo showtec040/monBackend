@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Publication = require('../models/publication'); // adapte le chemin si besoin
-const Notification = require('../models/notification'); // adapte le chemin si besoin
+const Notification = require('../models/Notification'); // adapte le chemin si besoin
 
 // Afficher toutes les publications
 router.get('/', async (req, res) => {
