@@ -7,7 +7,8 @@ const agentPresenceSchema = new mongoose.Schema({
     fonction: String,
     heureArrivee: String,
     heureDepart: String,
-    statut: String
+    statut: String,
+    rapport:String
 }, { _id: false });
 
 const presenceSchema = new mongoose.Schema({
