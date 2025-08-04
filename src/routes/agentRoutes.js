@@ -46,7 +46,26 @@ router.get('/en-attente/departement/:departement', agentController.getAgentsEnAt
 router.put('/:id/password', agentController.changePassword);
 // Modification des infos personnelles
 router.put('/agents/:id/infos', agentController.updateInfosPersonnelles);
-
+// Donner accès à un agent (niveau + délai)
+router.post('/:id/activer-compte', async (req, res) => {
+  try {
+    const { niveauAcces, delaiAcces } = req.body;
+    const agent = await Agent.findById(req.params.id);
+    if (!agent) return res.status(404).json({ success: false, message: "Agent non trouvé" });
+    agent.niveauAcces = niveauAcces;
+    let minutes = 0;
+    if (delaiAcces === '30min') minutes = 30;
+    else if (delaiAcces === '3H') minutes = 180;
+    else if (delaiAcces === '5H') minutes = 300;
+    else if (delaiAcces === '24H') minutes = 1440;
+    else minutes = 60;
+    agent.accesExpireAt = new Date(Date.now() + minutes * 60000);
+    await agent.save();
+    res.json({ success: true, message: "Accès attribué", expireAt: agent.accesExpireAt, niveau: agent.niveauAcces });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 // Récupérer un agent par ID
 router.get('/:id', agentController.getAgentById);
 
@@ -82,7 +101,7 @@ router.put('/:id/photo', upload.single('photo'), async (req, res) => {
   }
 });
 
-router.post('/:id/activer-compte', agentController.donnerAcces);
+
 // Authentification
 router.post('/login', async (req, res) => {
   try {
