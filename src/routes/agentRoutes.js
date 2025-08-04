@@ -13,14 +13,42 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const Agent = require('../models/agent');
 
-// Création d'agent avec upload de fichiers
+// Création d'agent avec upload de fichiers et hash du mot de passe
+const bcrypt = require('bcryptjs');
 router.post(
   '/',
   upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'documents', maxCount: 10 }
   ]),
-  agentController.createAgent
+  async (req, res, next) => {
+    try {
+      // On récupère les données du formulaire
+      const { email, password, fonction, departement, ...autres } = req.body;
+      // Hash du mot de passe
+      const hash = await bcrypt.hash(password, 10);
+      // Création de l'agent avec le mot de passe hashé
+      const agentData = {
+        email,
+        password: hash,
+        fonction,
+        departement,
+        ...autres
+      };
+      // Ajout des fichiers uploadés si présents
+      if (req.files && req.files['photo'] && req.files['photo'][0]) {
+        agentData.photo = '/uploads/' + req.files['photo'][0].filename;
+      }
+      if (req.files && req.files['documents']) {
+        agentData.documents = req.files['documents'].map(f => '/uploads/' + f.filename);
+      }
+      const agent = new Agent(agentData);
+      await agent.save();
+      res.json({ success: true, agent });
+    } catch (err) {
+      next(err);
+    }
+  }
 );
 
 // Récupérer tous les agents
@@ -93,7 +121,11 @@ router.post('/annuler-admin-provisoire', async (req, res) => {
   res.json({ success: true });
 });
 
-// Authentification
+// Authentification sécurisée avec JWT et bcrypt
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const JWT_SECRET = 'votre_cle_secrete_super_longue'; // À mettre dans un .env
+
 router.post('/login', async (req, res) => {
   try {
     const { loginInput, password } = req.body;
@@ -115,16 +147,35 @@ router.post('/login', async (req, res) => {
         message: "Votre compte n'est pas encore activé. Veuillez apporter vos documents auprès de votre secrétaire de direction pour la mise à jour de vos informations personnelles et la validation."
       });
     }
-    if (agent.password !== password) {
+    // Vérification du mot de passe hashé
+    const valid = await bcrypt.compare(password, agent.password);
+    if (!valid) {
       return res.json({ success: false, message: "Identifiant ou mot de passe incorrect." });
     }
-    res.json({ success: true, agent });
+    // Génération du token JWT
+    const token = jwt.sign(
+      { id: agent._id, fonction: agent.fonction, email: agent.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    res.json({ success: true, agent, token });
   } catch (err) {
     console.error("Erreur lors de la connexion :", err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
   }
 });
 
+// Middleware pour protéger les routes (à utiliser sur les routes sensibles)
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Token manquant' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: 'Token invalide' });
+    req.user = user;
+    next();
+  });
+}
 // Vérification email/téléphone
 router.post('/verifier', async (req, res) => {
   const { email, telephone } = req.body;
