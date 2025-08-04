@@ -6,7 +6,7 @@ const app = require('./app');
 const { setupSocket } = require('./socket'); // à créer si pas déjà fait
 const PORT = process.env.PORT || 3000;
 const path = require('path');
-
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Connexion à la base de données MongoDB Atlas ou locale
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pad')
