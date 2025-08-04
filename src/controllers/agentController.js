@@ -318,30 +318,27 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-exports.attribuerAdminProvisoire = async (req, res) => {
+exports.donnerAcces = async (req, res) => {
     try {
-        const { agentId, dureeMinutes } = req.body;
+        const { agentId, niveauAcces, delaiAcces } = req.body;
         const agent = await Agent.findById(agentId);
         if (!agent) return res.status(404).json({ success: false, message: "Agent non trouvé" });
-        // Ici tu peux ajouter la logique pour attribuer le rôle provisoire et la durée
-        agent.roleProvisoire = true;
-        agent.roleExpireAt = new Date(Date.now() + (parseInt(dureeMinutes) || 60) * 60000);
-        await agent.save();
-        res.json({ success: true, message: "Admin provisoire attribué", expireAt: agent.roleExpireAt });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
 
-exports.annulerAdminProvisoire = async (req, res) => {
-    try {
-        const { agentId } = req.body;
-        const agent = await Agent.findById(agentId);
-        if (!agent) return res.status(404).json({ success: false, message: "Agent non trouvé" });
-        agent.roleProvisoire = false;
-        agent.roleExpireAt = null;
+        // Attribuer le niveau d'accès
+        agent.niveauAcces = niveauAcces;
+
+        // Calculer la date d’expiration selon le délai choisi
+        let minutes = 0;
+        if (delaiAcces === '30min') minutes = 30;
+        else if (delaiAcces === '3H') minutes = 180;
+        else if (delaiAcces === '5H') minutes = 300;
+        else if (delaiAcces === '24H') minutes = 1440;
+        else minutes = 60; // Par défaut 1h
+
+        agent.accesExpireAt = new Date(Date.now() + minutes * 60000);
+
         await agent.save();
-        res.json({ success: true, message: "Rôle admin provisoire annulé" });
+        res.json({ success: true, message: "Accès attribué", expireAt: agent.accesExpireAt, niveau: agent.niveauAcces });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
