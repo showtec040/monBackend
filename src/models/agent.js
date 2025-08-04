@@ -60,8 +60,11 @@ const agentSchema = new mongoose.Schema({
     documents: [{ type: String }], // URLs ou base64 ou fichiers
     statut: { type: String, default: "en attente de mise à jour" },
     numeroInscription: { type: Number },
-    rapportPresence: { type: Array, default: [] }
-}, { timestamps: true });
+    rapportPresence: { type: Array, default: [] },
+    niveauAcces: { type: Number, default: 1 },
+accesExpireAt: { type: Date }
+},
+    { timestamps: true });
 
 agentSchema.index({ departement: 1, numeroInscription: 1 }, { unique: true, sparse: true });
 
