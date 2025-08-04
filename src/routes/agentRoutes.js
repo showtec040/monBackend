@@ -82,17 +82,7 @@ router.put('/:id/photo', upload.single('photo'), async (req, res) => {
   }
 });
 
-// Admin provisoire
-router.post('/attribuer-admin-provisoire', agentController.attribuerAdminProvisoire);
-router.post('/annuler-admin-provisoire', async (req, res) => {
-  const { agentId } = req.body;
-  await Agent.findByIdAndUpdate(agentId, {
-    adminProvisoire: false,
-    adminProvisoireExpire: null
-  });
-  res.json({ success: true });
-});
-
+router.post('/:id/activer-compte', agentController.donnerAcces);
 // Authentification
 router.post('/login', async (req, res) => {
   try {
