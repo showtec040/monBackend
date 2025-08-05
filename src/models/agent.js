@@ -61,7 +61,7 @@ const agentSchema = new mongoose.Schema({
     statut: { type: String, default: "en attente de mise à jour" },
     numeroInscription: { type: Number },
     rapportPresence: { type: Array, default: [] },
-    niveauAcces: { type: Number, default: 1 },
+    niveauAcces: { type: Number, default: 0 },
 accesExpireAt: { type: Date }
 },
     { timestamps: true });
