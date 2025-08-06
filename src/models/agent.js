@@ -62,7 +62,12 @@ const agentSchema = new mongoose.Schema({
     numeroInscription: { type: Number },
     rapportPresence: { type: Array, default: [] },
     niveauAcces: { type: Number, default: 0 },
-accesExpireAt: { type: Date }
+accesExpireAt: { type: Date },
+   empreinteId: {
+    type: Schema.Types.ObjectId, // ou String si vous préférez
+    ref: 'Empreinte', // optionnel, si vous avez une collection Empreinte
+    default: null
+  }
 },
     { timestamps: true });
 
