@@ -66,6 +66,21 @@ router.post('/:id/activer-compte', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+// Enregistrer l'empreinte digitale d'un agent
+router.post('/:id/enregistrer-empreinte', async (req, res) => {
+  try {
+    const agent = await Agent.findById(req.params.id);
+    if (!agent) return res.status(404).json({ success: false, message: "Agent non trouvé" });
+    const { empreinteId } = req.body;
+    if (!empreinteId) return res.status(400).json({ success: false, message: "Empreinte manquante" });
+    agent.empreinteId = empreinteId;
+    await agent.save();
+    res.json({ success: true, message: "Empreinte enregistrée", agent });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+});
 // Récupérer un agent par ID
 router.get('/:id', agentController.getAgentById);
 
