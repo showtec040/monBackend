@@ -30,12 +30,11 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // ou plus si besoin
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-<<<<<<< HEAD
+
 app.use(methodOverride('_method')); // <-- Ajoute cette ligne ici
-=======
 app.use(methodOverride('_method'));
 app.use('/api/email', emailRoutes);
->>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
+
 
 // Middleware de vérification de version frontend
 const FRONTEND_VERSION = "1.0.1"; // À mettre à jour à chaque release
