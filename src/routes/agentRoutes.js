@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 const Agent = require('../models/agent');
+const { authenticateToken } = require('../utils/auth');
 
 // Création d'agent avec upload de fichiers
 router.post(
@@ -22,10 +23,17 @@ router.post(
   ]),
   agentController.createAgent
 );
+<<<<<<< HEAD
 
 // Récupérer tous les agents
 router.get('/', agentController.getAllAgents);
 
+=======
+
+// Récupérer tous les agents (protégé)
+router.get('/', authenticateToken, agentController.getAllAgents);
+
+>>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 // Routes spécifiques AVANT les routes dynamiques
 router.get('/fonction/:fonction', async (req, res) => {
   const agents = await Agent.find({ fonction: req.params.fonction });
@@ -81,24 +89,41 @@ router.post('/:id/enregistrer-empreinte', async (req, res) => {
     res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 });
+<<<<<<< HEAD
 // Récupérer un agent par ID
 router.get('/:id', agentController.getAgentById);
 
 // Modification d'un agent (avec upload)
+=======
+// Récupérer un agent par ID (protégé)
+router.get('/:id', authenticateToken, agentController.getAgentById);
+
+// Modification d'un agent (avec upload, protégé)
+>>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 router.put(
   '/:id',
+  authenticateToken,
   upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'documents', maxCount: 10 }
   ]),
   agentController.updateAgent
 );
+<<<<<<< HEAD
 
 // Validation, complétion, suppression
 router.put('/valider/:id', agentController.validerAgent);
 router.put('/completer/:id', agentController.completerInfosAgent);
 router.delete('/:id', agentController.deleteAgent);
 
+=======
+
+// Validation, complétion, suppression (protégées)
+router.put('/valider/:id', authenticateToken, agentController.validerAgent);
+router.put('/completer/:id', authenticateToken, agentController.completerInfosAgent);
+router.delete('/:id', authenticateToken, agentController.deleteAgent);
+
+>>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 // Upload de photo seule
 router.put('/:id/photo', upload.single('photo'), async (req, res) => {
   try {
@@ -117,7 +142,15 @@ router.put('/:id/photo', upload.single('photo'), async (req, res) => {
 });
 
 
+<<<<<<< HEAD
 // Authentification
+=======
+// Authentification avec JWT
+const jwt = require('jsonwebtoken');
+const { secret } = require('../utils/auth');
+const bcrypt = require('bcryptjs');
+
+>>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 router.post('/login', async (req, res) => {
   try {
     const { loginInput, password } = req.body;
@@ -139,10 +172,21 @@ router.post('/login', async (req, res) => {
         message: "Votre compte n'est pas encore activé. Veuillez apporter vos documents auprès de votre secrétaire de direction pour la mise à jour de vos informations personnelles et la validation."
       });
     }
+<<<<<<< HEAD
     if (agent.password !== password) {
       return res.json({ success: false, message: "Identifiant ou mot de passe incorrect." });
     }
     res.json({ success: true, agent });
+=======
+    // Vérification du mot de passe hashé
+    const passwordMatch = await bcrypt.compare(password, agent.password);
+    if (!passwordMatch) {
+      return res.json({ success: false, message: "Identifiant ou mot de passe incorrect." });
+    }
+    // Génération du token JWT
+    const token = jwt.sign({ id: agent._id, email: agent.email }, secret, { expiresIn: '24h' });
+    res.json({ success: true, token, agent });
+>>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
   } catch (err) {
     console.error("Erreur lors de la connexion :", err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
