@@ -28,16 +28,6 @@ router.post('/', async (req, res) => {
         });
         const saved = await nouvellePublication.save();
 
-<<<<<<< HEAD
-        // Création de la notification
-        const notif = new Notification({
-            message: `Nouvelle publication : ${titre}`,
-            auteur: nomAuteur || auteur,
-            via: "Publication",
-            createdAt: new Date()
-        });
-        await notif.save();
-=======
         // Création de la notification pour chaque agent
         const Agent = require('../models/agent');
         const agents = await Agent.find({}, '_id');
@@ -48,7 +38,6 @@ router.post('/', async (req, res) => {
             lu: false
         }));
         await Notification.insertMany(notifications);
->>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 
         res.json(saved);
     } catch (err) {
