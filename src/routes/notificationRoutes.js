@@ -36,21 +36,6 @@ router.get('/count', async (req, res) => {
   res.json({ count });
 });
 
-<<<<<<< HEAD
-router.post('/',
-  async (req, res) => {
-    const { courrier } = req.body;
-    await Notification.create({
-      userId: courrier.destinataire,
-      message: `Vous avez bien confirmé la réception du courrier \"${courrier.objet}\".`,
-      lu: false,
-      date: new Date()
-    });
-    res.status(201).send();
-  }
-);
-
-=======
 // Pour émettre via Socket.IO
 const { getIO } = require('../socket');
 
@@ -72,5 +57,4 @@ router.post('/', async (req, res) => {
   res.status(201).send();
 });
 
->>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 module.exports = router;
