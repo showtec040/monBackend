@@ -1,9 +1,6 @@
 const Agent = require('../models/agent');
 const Notification = require('../models/Notification');
-<<<<<<< HEAD
-=======
 const bcrypt = require('bcryptjs');
->>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
 
 // Créer un nouvel agent
 exports.createAgent = async (req, res) => {
@@ -316,13 +313,6 @@ exports.changePassword = async (req, res) => {
     const ancienMotDePasse = req.body.ancienMotDePasse;
     const nouveauMotDePasse = req.body.nouveauMotDePasse;
 
-<<<<<<< HEAD
-    if (agent.password !== ancienMotDePasse) {
-      return res.status(400).json({ success: false, message: "Ancien mot de passe incorrect." });
-    }
-
-    agent.password = nouveauMotDePasse;
-=======
     // Vérification du mot de passe hashé
     const passwordMatch = await bcrypt.compare(ancienMotDePasse, agent.password);
     if (!passwordMatch) {
@@ -330,7 +320,6 @@ exports.changePassword = async (req, res) => {
     }
 
     agent.password = await bcrypt.hash(nouveauMotDePasse, 10);
->>>>>>> d8273cb (Mise à jour backend : sécurité, email, corrections)
     await agent.save();
     res.json({ success: true, message: "Mot de passe mis à jour avec succès." });
   } catch (err) {
